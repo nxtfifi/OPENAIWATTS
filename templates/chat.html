@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Chatbot</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <div class="chatbot-container" id="chatbot-container">
+        <button class="chat-bubble" id="chatToggle">
+            <span class="bubble-icon"> ⚡ </span>
+        </button>
+
+        <div class="chatbox" id="chatbox">
+            <div class="chatbox-header">
+                <span> Watts</span>
+            </div>
+
+            <div class="chatbox-body" id="chatBody">
+            <div class="message bottom" id>
+                <div class="message-sender">Watts</div>
+                <div class="message-content">
+                    <p>¡Hola! ¿Estas listo para una descarga de conocimientos ? ⚡</p>
+                </div>
+            </div> 
+            </div>
+
+            <div class="chatbox-footer">
+                <form id="messageForm" class="input-container">
+                    <input type="text" id="messageInput" placeholder="Escribe tu mensaje" required>
+                    <button type="submit" class="send-button">
+                        <span>➤</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+                // Variables globales
+        const chatToggle = document.getElementById('chatToggle');
+        const chatbox = document.getElementById('chatbox');
+        const chatBody = document.getElementById('chatBody');
+        const messageForm = document.getElementById('messageForm');
+        const messageInput = document.getElementById('messageInput');
+
+        // Toggle del chat
+        chatToggle.addEventListener('click', () => {
+            const isActive = chatbox.classList.contains('active');
+            
+            if (isActive) {
+                chatbox.classList.remove('active');
+                chatToggle.classList.remove('active');
+                chatToggle.classList.add('pulse');
+            } else {
+                chatbox.classList.add('active');
+                chatToggle.classList.add('active');
+                chatToggle.classList.remove('pulse');
+                messageInput.focus();
+            }
+        });
+
+        // Cerrar chat al hacer clic fuera
+        document.addEventListener('click', (e) => {
+            if (!chatToggle.contains(e.target) && !chatbox.contains(e.target)) {
+                chatbox.classList.remove('active');
+                chatToggle.classList.remove('active');
+                chatToggle.classList.add('pulse');
+            }
+        });
+
+        // Función para agregar mensajes
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+            
+            const senderDiv = document.createElement('div');
+            senderDiv.className = 'message-sender';
+            senderDiv.textContent = isUser ? 'Tú' : 'Wattson';
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.textContent = content;
+            
+            messageDiv.appendChild(senderDiv);
+            messageDiv.appendChild(contentDiv);
+            chatBody.appendChild(messageDiv);
+            
+            // Scroll al final
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        // Enviar mensaje
+        messageForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            // Agregar mensaje del usuario
+            addMessage(message, true);
+            messageInput.value = '';
+            
+            // Mostrar indicador de escritura
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot';
+            typingDiv.innerHTML = `
+                <div class="message-sender">Wattson</div>
+                <div class="message-content">
+                    <span style="opacity: 0.6;">Escribiendo...</span>
+                </div>
+            `;
+            chatBody.appendChild(typingDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
+            
+            try {
+                // Enviar mensaje al servidor
+                const response = await fetch('/preguntar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ mensaje: message })
+                });
+                
+                const data = await response.json();
+                
+                // Remover indicador de escritura
+                chatBody.removeChild(typingDiv);
+                
+                // Agregar respuesta del bot
+                addMessage(data.respuesta);
+                
+            } catch (error) {
+                // Remover indicador de escritura
+                chatBody.removeChild(typingDiv);
+                
+                // Mostrar error
+                addMessage('Lo siento, hubo un error. ¡Pero mis circuitos siguen funcionando! ⚡');
+                console.error('Error:', error);
+            }
+        });
+
+        // Enter para enviar
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                messageForm.dispatchEvent(new Event('submit'));
+            }
+        });
+    </script>
+</body>
+</html>
