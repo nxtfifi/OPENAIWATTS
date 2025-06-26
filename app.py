@@ -19,7 +19,7 @@ def index():
 @app.route('/preguntar', methods=['POST'])
 def preguntar():
     user_input=request.json['mensaje']
-    messages.append({"role":"system","content":user_input})
+    messages.append({"role":"user","content":user_input})
     completion=client.chat.completions.create(
         model="gpt-4.1",
         messages=messages   
