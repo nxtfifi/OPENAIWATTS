@@ -1,0 +1,74 @@
+ body{
+    margin: 0;
+    font-family: Arial, sans-serif;
+ }
+ 
+ 
+ .chatbot-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 999;
+    }
+
+    /* Oculta el checkbox */
+    #toggle-chat {
+      display: none;
+    }
+
+    /* Botón de abrir chat */
+    .chat-button {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Caja de chat (oculta por defecto) */
+    .chatbox {
+      width: 300px;
+      height: 400px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+    }
+
+    /* Mostrar el chatbox cuando está activo */
+    #toggle-chat:checked + label + .chatbox {
+      display: flex;
+    }
+
+    .chatbox-header {
+      background-color: #007bff;
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .chatbox-body {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+    }
+
+    .chatbox-footer {
+      padding: 10px;
+      border-top: 1px solid #ccc;
+    }
+
+    .chatbox-footer input {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
